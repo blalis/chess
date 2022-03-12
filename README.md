@@ -1,6 +1,6 @@
 Description soon.
 Currently only level 0 is programmed - totally random moves by computer
 ( software random generator ).
-Possibility of training ( moving both white and black pieces ),
-playing with computer ( with possibility to change color during the game
-( training ) and normal ( without such possibility ) ).
+Possibility of chess training ( moving both white and black pieces ) and
+possiblity of playing with computer ( with a feature to change color during the game
+( training ) and without such option ( normal ) ).
