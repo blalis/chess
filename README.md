@@ -25,7 +25,7 @@ Game options:
 2) play against computer ( with a feature to change color during the game
 ( training ) and without such an option ( normal game ) ).
 <br>
-MENU
+MENU<br><br>
 1) "Play against computer"<br>
 Playing against computer without possibility to switch sides.<br>
 2) "Play against computer/training"<br>
