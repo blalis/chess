@@ -9,6 +9,7 @@ Future changes and plans:
 <br>
 
 HOW TO PLAY?
+<br>
 To play the game you need to download game directory and open chess.html in browser
 ( JS support in browser is required!!! ). Firefox/Chrome/Chromium/Opera and most of other
 existing browsers should be OK.
@@ -26,6 +27,7 @@ Game options:
 <br>
 <br>
 MENU
+<br>
 1) "Play against computer"<br>					
 Playing against computer without possibility to switch sides.
 
@@ -41,6 +43,7 @@ Not programmed yet.
 
 <br>
 CONTROL BUTTONS:
+<br>
 1) "New game"<br>
 Start a new game ( all game modes ).
 2) "flip view"<br>
@@ -54,8 +57,8 @@ Not programmed yet ( it will appear alongside adding higher difficulty levels or
 with fellows ).
 6) "take back move"<br>
 Take back last move, works only with training mode.
-<nr>
-
+<br>
+<br>
 
 Special moves:
 1) enable/disable special moves<br>
