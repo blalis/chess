@@ -26,7 +26,7 @@ Game options:
 ( training ) and without such an option ( normal game ) ).
 <br>
 MENU
-<br>
+
 1) "Play against computer"<br>
 Playing against computer without possibility to switch sides.
 <br>
@@ -41,8 +41,9 @@ Player controls both white and black pieces.
 Not programmed yet.
 
 <br>
-CONTROL BUTTONS:
 <br>
+
+CONTROL BUTTONS:
 1) "New game"<br>
 Start a new game ( all game modes ).<br>
 2) "flip view"<br>
