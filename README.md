@@ -38,6 +38,7 @@ Not programmed yet.
 
 <br>
 <br>
+<br>
 
 CONTROL BUTTONS:
 1) "New game"<br>
