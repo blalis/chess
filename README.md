@@ -28,15 +28,12 @@ Game options:
 MENU
 
 1) "Play against computer"<br>
-Playing against computer without possibility to switch sides.
-<br>
+Playing against computer without possibility to switch sides.<br>
 2) "Play against computer/training"<br>
 Playing against computer with possibility to experiment.<br>
-Switch ( below ) "Play as:" allows to change sides ( pieces color )
-<br>
+Switch ( below ) "Play as:" allows to change sides ( pieces color )<br>
 3) "Training"<br>
-Player controls both white and black pieces.
-<br>
+Player controls both white and black pieces.<br>
 4) "Play against human"<br>
 Not programmed yet.
 
