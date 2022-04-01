@@ -11,7 +11,7 @@ HOW TO PLAY?
 To play the game you need to download game directory and open chess.html in browser
 ( JS support in browser is required!!! ). Firefox/Chrome/Chromium/Opera and most of other
 existing browsers should be OK.
-1) click on green button "Code" -> "Download ZIP" or download via HTTPS link.
+1) click on green button "Code" -> "Download ZIP" or download via HTTPS link
 2) unzip ( if needed )
 3) open chess.html ( in main directory ) in your WEB browser
 
