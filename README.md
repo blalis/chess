@@ -25,19 +25,18 @@ Game options:
 2) play against computer ( with a feature to change color during the game
 ( training ) and without such an option ( normal game ) ).
 <br>
-<br>
 MENU
 <br>
-1) "Play against computer"<br>					
+1) "Play against computer"<br>
 Playing against computer without possibility to switch sides.
-
+<br>
 2) "Play against computer/training"<br>
-Playing against computer with possibility to experiment.
+Playing against computer with possibility to experiment.<br>
 Switch ( below ) "Play as:" allows to change sides ( pieces color )
-
+<br>
 3) "Training"<br>
 Player controls both white and black pieces.
-
+<br>
 4) "Play against human"<br>
 Not programmed yet.
 
@@ -45,16 +44,16 @@ Not programmed yet.
 CONTROL BUTTONS:
 <br>
 1) "New game"<br>
-Start a new game ( all game modes ).
+Start a new game ( all game modes ).<br>
 2) "flip view"<br>
-switch view ( white/black at the screen bottom ).
+switch view ( white/black at the screen bottom ).<br>
 3) "turn OFF/ON flipping view"<br>
-turn on/off auto view switching.
+turn on/off auto view switching.<br>
 4) "Resign"<br>
-Resign current game ( need to confirm this choice by clicking "OK" )
+Resign current game ( need to confirm this choice by clicking "OK" )<br>
 5) "Draw"<br>
 Not programmed yet ( it will appear alongside adding higher difficulty levels or adding possiblity to play
-with fellows ).
+with fellows ).<br>
 6) "take back move"<br>
 Take back last move, works only with training mode.
 <br>
