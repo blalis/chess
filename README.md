@@ -37,6 +37,7 @@ Player controls both white and black pieces.<br>
 Not programmed yet.
 
 <br>
+<br>
 
 CONTROL BUTTONS:
 1) "New game"<br>
