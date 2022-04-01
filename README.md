@@ -26,7 +26,6 @@ Game options:
 ( training ) and without such an option ( normal game ) ).
 <br>
 MENU
-
 1) "Play against computer"<br>
 Playing against computer without possibility to switch sides.<br>
 2) "Play against computer/training"<br>
@@ -37,7 +36,6 @@ Player controls both white and black pieces.<br>
 4) "Play against human"<br>
 Not programmed yet.
 
-<br>
 <br>
 
 CONTROL BUTTONS:
