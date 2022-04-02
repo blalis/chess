@@ -1,0 +1,269 @@
+body
+{
+  //background-color: #4503fc;
+  background-color: #1c5875;
+  color: white;
+}
+#main {
+}
+#left-side {
+  float:left;
+}
+#right-side {
+  float: left;
+  margin-left: 30px;
+}
+#options-main {
+  width: 100%;
+  text-align:right;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow:scroll;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+.options-menu-buttons {
+  margin-right: 10px;
+  background-color: #0d7335;
+  color: white;
+  height: 70%;
+  font-size: 15px;
+  border-radius: 20px;
+  border: solid 2px yellow;
+  padding: 2%;
+  flex: 0 0 auto;
+}
+.options-menu-buttons_active {
+  //background-color: #34b7eb;
+  background-color: #3486eb;
+  color: white;
+  height: 70%;
+  border-radius: 20px;
+  border: solid 2px yellow;
+  padding: 2%;
+  flex: 0 0 auto;
+}
+#above-board{
+  height: 90px;
+}
+#chessboard{
+}
+#notifications-current-game
+{
+  text-align: center;
+}
+#pawn-promotion-field
+{
+	display: inline-flex;
+	padding: 5px;
+  text-align: center;
+	color: white;
+  font-weight: bold;
+}
+#pawn-promotion-field img {
+}
+.promotion-piece {
+	display: inline-block;
+	border-top: solid 2px black;
+	border-left: solid 2px black;
+	border-bottom: solid 2px black;
+  background-color: white;
+}
+#promotion-piece-cancel {
+	display: inline-block;
+  background-color: white;
+	border: solid 2px black;
+}
+#promotion-piece-cancel img{
+  margin-top: 15%;
+}
+input[type="button"]:disabled {
+  color: silver;
+  border: solid silver 2px;
+}
+#board-top{
+  float: left;
+  width: 100%;
+}
+#board {
+	display: block;
+  float: left;
+	border: solid black 2px;
+	overflow: hidden;
+  margin-bottom: 10px;
+}
+#board img {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+		left: 0;
+		right: 0;
+    margin: auto;
+}
+#numbers {
+  display: block;
+	float: left;
+  margin-top: 6px;
+	overflow: hidden;
+}
+.field-numbers {
+  display: table;
+  height: 12.5%;
+	width: 100%;
+  text-align:center;
+}
+.field-numbers span {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  font-weight: bold;
+}
+.chessfield-white {
+	display: inline-block;
+	position: relative;
+	height: 12.5%;
+	width: 12.5%;
+	text-align: center;
+	background-color: white;
+}
+.chessfield-black {
+	display: inline-block;
+	position: relative;
+	height: 12.5%;
+	width: 12.5%;
+	text-align: center;
+	background-color: black;
+	color: white;
+}
+#letters-container{
+  float:left;
+  width:100%;
+}
+#letters {
+  display: block;
+  color: white;
+  font-size: 50px;
+  font-weight: bold;
+}
+.field-letters {
+  display: inline-block;
+	width: 12.5%;
+  height:100%;
+  text-align:center;
+  overflow: hidden;
+}
+.field-letters span {
+  color: white;
+}
+#button-switch-auto-flip-view {
+  background-color: green;
+}
+.game-options-buttons-class{
+	display: block;
+	margin-bottom: 5px;
+  background-color: #4f4831;
+  color: white;
+  padding: 5px;
+}
+#moves_history{
+  overflow:scroll;
+  overflow-x:hidden;
+  overflow-y: auto;
+  background-color: #042647;
+  color: white;
+  font-size: 18px;
+  border-radius: 10px;
+  padding: 5px;
+}
+#moves_history_panel{
+  float:left;
+  margin-top: 1%;
+  margin-bottom: 1%;
+  font: 25px;
+  text-align: center;
+  color: white;
+}
+#game-options{
+  //display: flex;
+  //flex-wrap: nowrap;
+  overflow:auto;
+  //overflow-x: auto;
+  //overflow-y: auto;
+}
+#game-options-buttons{
+  float: left;
+  max-width: 45%;
+  overflow:auto;
+  //overflow-x: scroll;
+  //overflow-y: scroll;
+  //flex: 0 0 auto;
+}
+#game-options-checks{
+    float: left;
+    overflow:auto;
+    max-width: 48%;
+    margin-left: 5%;
+  //flex: 0 0 auto;
+}
+#game-options-buttons input[type="button"]{
+  width: 100%;
+}
+#general-game-options{
+  float:left;
+  width:100%;
+}
+#computer-game-options{
+  float: left;
+  width:100%;
+  margin-top:5px;
+}
+#figures{
+  margin-top: 10px;
+  width: 100%;
+  float: left;
+}
+#figures-remaining{
+  float:left;
+  width: 100%;
+}
+#figures-remaining-title {
+}
+#figures-remaining-img{
+  display: flex;
+  flex-wrap: wrap;
+  overflow:scroll;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+#white-figures{
+  width: 100%;
+  flex: 0 0 auto;
+}
+#black-figures{
+  width: 100%;
+  flex: 0 0 auto;
+}
+#figures-material{
+  float: left;
+  width: 100%;
+  margin-top: 10px;
+}
+#figures-material-img{
+  display: flex;
+  flex-wrap: wrap;
+  overflow:scroll;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+#white-uniq-figures{
+  flex: 0 0 auto;
+  width: 100%;
+  height: 50%;
+}
+#black-uniq-figures{
+  flex: 0 0 auto;
+  width: 100%;
+  height: 50%;
+}
