@@ -1,6 +1,6 @@
-Chess program written in pure JavaScript ( JS, HTML, CSS ).
+A chess program written in pure JavaScript ( JS, HTML, CSS ).
 Currently only level 0 is programmed - totally random moves made by computer
-( software random generator ). There are still few minor bugs to eliminate.
+(software random generator). There are still few minor bugs to eliminate.
 <br>
 Future changes and plans:
 1) adding higher difficulty levels
@@ -10,13 +10,19 @@ Future changes and plans:
 
 HOW TO PLAY?
 <br>
-To play the game you need to download game directory and open chess.html in browser
-( JS support in browser is required!!! ). Firefox/Chrome/Chromium/Opera and most of other
+To play the game you need to download the game directory and open chess.html in your browser
+(JS support in browser is required!!!). Firefox/Chrome/Chromium/Opera and most of other
 existing browsers should be OK.
 1) click on green button "Code" -> "Download ZIP" or download via HTTPS link
-2) unzip ( if needed )
-3) open chess.html ( in main directory ) in your WEB browser
+2) unzip (if needed)
+3) open chess.html (it is in the main directory) in your WEB browser
 <br>
+
+Screenshots:
+![plot](./README_image/chess_1.png)
+![plot](./README_image/chess_2.png)
+![plot](./README_image/chess_3.png)
+![plot](./README_image/chess_4.png)
 
 PROGRAM USAGE:
 
@@ -27,10 +33,10 @@ Game options:
 <br>
 MENU<br><br>
 1) "Play against computer"<br>
-Playing against computer without possibility to switch sides.<br>
+Playing against computer without a possibility to switch sides.<br>
 2) "Play against computer/training"<br>
-Playing against computer with possibility to experiment.<br>
-Switch ( below ) "Play as:" allows to change sides ( pieces color )<br>
+Playing against computer with a possibility to experiment.<br>
+Switch ( below ) "Play as:" allows to change sides ( the color of pieces )<br>
 3) "Training"<br>
 Player controls both white and black pieces.<br>
 4) "Play against human"<br>
@@ -48,12 +54,12 @@ switch view ( white/black at the screen bottom ).<br>
 3) "turn OFF/ON flipping view"<br>
 turn on/off auto view switching.<br>
 4) "Resign"<br>
-Resign current game ( need to confirm this choice by clicking "OK" )<br>
+Resign in the current game ( you need to confirm this choice by clicking "OK" )<br>
 5) "Draw"<br>
-Not programmed yet ( it will appear alongside adding higher difficulty levels or adding possiblity to play
+Not programmed yet ( it will appear alongside adding higher difficulty levels or adding a possiblity to play
 with fellows ).<br>
 6) "take back move"<br>
-Take back last move, works only with training mode.
+Take back the last move, works only with training mode.
 <br>
 <br>
 
@@ -69,8 +75,8 @@ Special effects:
 1) Turn on/off everything<br>
 Enable/disable all options under this section.
 2) possible moves lighting<br>
-Showing possible moves for chosen piece ( blue color ).
+Showing possible moves for the chosen piece ( blue color ).
 3) Check lighting<br>
-Showing check ( king and checking pieces ). Red color.
+Showing check ( king and the checking pieces ). Red color.
 4) use arrows to move<br>
 Allow to move pieces by using arrows and ENTER.
