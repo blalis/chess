@@ -1,10 +1,16 @@
 // vars declarations
-let dim = 8;
+let default_dim = 8;
+let dim = default_dim;
 let board = new Array(dim).fill(null).map(()=>new Array(dim).fill(null));
-let letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+let letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
 //let letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 //let html_chess = { "WK" : "&#9812", "WQ" : "&#9813", "WR" : "&#9814", "WB" : "&#9815", "WN" : "&#9816", "WP" : "&#9817", "BK" : "&#9818", "BQ" : "&#9819", "BR" : "&#9820", "BB" : "&#9821", "BN" : "&#9822", "BP" : "&#9823" };
 let figures = ['R','N','B','Q','K','B','N','R'];
+let figure_strength = {'Q': 9, 'R': 5, 'B': 3.5, 'N': 3, 'P': 1};
+let chess_piece_image_directory_universal = 'chess_piece_image/';
+let chess_piece_image_directory_one_color = 'chess_piece_image_one_color/';
+let chess_piece_image_directory = chess_piece_image_directory_universal;
+let chessboard_side;
 let moves = [];
 let game_with_computer = 0;
 let computer_player = 'B';
@@ -35,9 +41,20 @@ let check_if_first_rook_moved = { "W":0,"B":0 };
 let check_if_second_rook_moved = { "W":0,"B":0 };
 let flip_view = 'W';
 let auto_flip_view = 1;
+let mouse_move;
+let mouse_moving_piece;
+let mouse_moving_piece_offset_x;
+let mouse_moving_piece_offset_y;
+let mouse_moving_start_field_offset_x;
+let mouse_moving_start_field_offset_y;
+let chess_board_x_left, chess_board_x_right, chess_board_y_bottom, chess_board_y_top;
 let drag_piece;
+let white_player = 'white';
+let black_player = 'black';
+let white_field_color = 'white';
+let black_field_color = 'black';
 let field_sign_color = 'gold';
-let possible_move_show_color = 'dodgerblue';
+let possible_move_show_color = 'goldenrod';
 let check_show_color = 'red';
 let arrow_control_switch = 0;
 let arrow_last_white_position;
@@ -46,6 +63,7 @@ let arrow_current_position = 'A1';
 let arrow_current_position_color = 'green';
 let arrow_current_position_previous_color;
 let square_side;
+let default_side;
 let pawn_promotion_field_image_size;
 let current_move_change = 0;
 let current_move_global;
@@ -63,6 +81,7 @@ window.addEventListener("keydown", keycontrol);
 // FUNCTIONS triggered on page load !!!
 new_game();
 set_board_dimensions();
+set_default_color();
 training();
 
 // FUNCTIONS to build
@@ -140,7 +159,7 @@ function computer_move(){
     temp_field_y_2 = temp_field_x_2['y'];
     temp_field_x_2 = temp_field_x_2['x'];
   } while( check_move_possibility(board[temp_field_y_1][temp_field_x_1],'',moving_piece_field,moving_piece_target) == 0 );
-  //} while( check_if_king_will_be_checked_after_move( computer_player,temp_field_x_1,temp_field_y_1,temp_field_x_2,temp_field_y_2,1 ) != 0 );
+  //} while( check_if_king_will_be_checked_after_move( board, computer_player,temp_field_x_1,temp_field_y_1,temp_field_x_2,temp_field_y_2,1 ) != 0 );
 /*
   console.log(moving_piece_field);
   console.log(moving_piece_target);
@@ -190,7 +209,7 @@ function show_all_moves_to_prevent_check(chessboard){
     temp_field_x_1 = get_board_index(move);
     temp_field_y_1 = temp_field_x_1['y'];
     temp_field_x_1 = temp_field_x_1['x'];
-    if( check_if_king_will_be_checked_after_move( checked_player,temp_field_x_1,temp_field_y_1,checking_field_x,checking_field_y,1 ) == 0 )
+    if( check_if_king_will_be_checked_after_move( chessboard, checked_player,temp_field_x_1,temp_field_y_1,checking_field_x,checking_field_y,1 ) == 0 )
       moves.push(move+':'+attacking_fields[0]);
   }
   for(move of show_fields_between_piece_and_destination(chessboard,king_x,king_y,checking_field_x,checking_field_y)){
@@ -201,7 +220,7 @@ function show_all_moves_to_prevent_check(chessboard){
       temp_field_x_2 = get_board_index(move);
       temp_field_y_2 = temp_field_x_2['y'];
       temp_field_x_2 = temp_field_x_2['x'];
-      if( check_if_king_will_be_checked_after_move( checked_player,temp_field_x_1,temp_field_y_1,temp_field_x_2,temp_field_y_2,1 ) == 0 )
+      if( check_if_king_will_be_checked_after_move( chessboard, checked_player,temp_field_x_1,temp_field_y_1,temp_field_x_2,temp_field_y_2,1 ) == 0 )
         moves.push(field+':'+move);
     }
   }
@@ -268,10 +287,11 @@ function set_difficulty_level(level){
   level_checkbox.checked=true;
 }
 
-function get_all_possible_moves_for_player( chessboard,player_to_move ){
+function get_all_possible_moves_for_player( chessboard, player_to_move ){
   let moves = [];
   let piece_moves = [];
   let x,y,field;
+  console.log("Function");
   for( y=0;y<dim;y++ ){
     for( x=0;x<dim;x++ ){
       if( chessboard[y][x][0] == player_to_move ){
@@ -297,7 +317,7 @@ function get_all_possible_moves_for_player( chessboard,player_to_move ){
       	}
         for( move of piece_moves ){
           field=get_field_name_from_board( x,y );
-          moves.push( field+':'+move );
+          moves.push( field + ':' + move );
         }
         //console.log(moves);
       }
@@ -396,16 +416,171 @@ function new_game(obj='') {
     obj.blur();
 }
 
+function change_board_dimension(dimension) {
+    dim = dimension;
+    board = new Array(dim).fill(null).map(()=>new Array(dim).fill(null));
+    new_game();
+    set_board_dimensions();
+}
+
+function uncheck_play_option_checks() {
+    let elements = document.getElementsByClassName('play_options_check');
+    for(let i=0 ; i<elements.length ; i++) {
+        elements[i].checked = false;
+    }
+}
+
+function set_64_field_board_check(el) {
+    uncheck_play_option_checks();
+    set_64_field_board();
+    document.getElementById(el.id).checked = true;
+}
+
+function set_81_field_board_check(el) {
+    uncheck_play_option_checks();
+    set_81_field_board();
+    document.getElementById(el.id).checked = true;
+}
+
+function set_100_field_board_check(el) {
+    uncheck_play_option_checks();
+    set_100_field_board();
+    document.getElementById(el.id).checked = true;
+}
+
+function set_121_field_board_check(el) {
+    uncheck_play_option_checks();
+    set_121_field_board();
+    document.getElementById(el.id).checked = true;
+}
+
+function set_64_field_board() {
+    change_board_dimension(8);
+}
+
+function set_81_field_board() {
+    change_board_dimension(9);
+}
+
+function set_100_field_board() {
+    change_board_dimension(10);
+}
+
+function set_121_field_board() {
+    change_board_dimension(11);
+}
+
+function uncheck_color_set_checks() {
+    let elements = document.getElementsByClassName('color_set_class');
+    for(let i=0 ; i<elements.length ; i++) {
+        elements[i].checked = false;
+    }
+}
+
+function set_black_white_color(el) {
+    uncheck_color_set_checks();
+    chess_piece_image_directory = chess_piece_image_directory_universal;
+    set_chess_field_colors(1);
+    document.getElementById(el.id).checked = true;
+}
+
+function set_white_blue_color(el) {
+    uncheck_color_set_checks();
+    chess_piece_image_directory = chess_piece_image_directory_universal;
+    set_chess_field_colors(2);
+    document.getElementById(el.id).checked = true;
+}
+
+function set_default_color(el) {
+    if(el)
+        uncheck_color_set_checks();
+    chess_piece_image_directory = chess_piece_image_directory_universal;
+    set_chess_field_colors(3);
+    if(el)
+        document.getElementById(el.id).checked = true;
+}
+
+function set_double_blue_color(el) {
+    uncheck_color_set_checks();
+    chess_piece_image_directory = chess_piece_image_directory_one_color;
+    set_chess_field_colors(4);
+    document.getElementById(el.id).checked = true;
+}
+
+function set_chess_field_colors(set_number) {
+    let previous_white_color = white_field_color;
+    let previous_black_color = black_field_color;
+    switch(set_number) {
+        case 1:
+            white_field_color = white_player;
+            black_field_color = black_player;
+            break;
+        case 2:
+            white_field_color = '#FFFFE0';
+            black_field_color = '#00BFFF';
+            break;
+        case 3:
+            white_field_color = '#FFDEAD';
+            black_field_color = '#00BFFF';
+            break;
+        case 4:
+            white_field_color = '#00CED1';
+            black_field_color = '#1E90FF';
+    }
+    render_chessboard();
+      if( click == 1 ) {
+        document.getElementById(clicked_field).style.backgroundColor = field_sign_color;
+        if( showing_possible_moves == 1 )
+            show_possible_moves( clicked_field );
+      }
+      if( lighting_check == 1 && check_if_king_is_checked(player,board) > 0 )
+        show_check( board,player );
+}
+
 function deploy_figures( chessboard ) {
-  let x,y;
+  let x,y, figure_order=[];
+    if(dim == default_dim)
+        figure_order = figures;
+    else if(dim == default_dim + 1) {
+        for(let i=0;i<5;i++)
+            figure_order[i] = figures[i];
+        figure_order[5] = 'Q';
+        for(let i=5;i<dim - 1;i++)
+            figure_order[i + 1] = figures[i];
+        figure_order[6] = 'N';
+        figure_order[7] = 'B';
+    }
+    else if(dim == default_dim + 2) {
+        for(let i=0;i<4;i++)
+            figure_order[i] = figures[i];
+        figure_order[4] = 'Q';
+        figure_order[5] = 'K';
+        figure_order[6] = 'Q';
+        for(let i=5;i<dim - 2;i++)
+            figure_order[i + 2] = figures[i];
+    }
+    else if(dim == default_dim + 3) {
+        for(let i=0;i<4;i++)
+            figure_order[i] = figures[i];
+        figure_order[4] = 'Q';
+        figure_order[5] = 'K';
+        figure_order[6] = 'Q';
+        figure_order[7] = 'Q';
+        for(let i=5;i<dim - 3;i++)
+            figure_order[i + 3] = figures[i];
+    }
 	for( x = 0 ; x < dim ; x++ ){
-		chessboard[0][x] = 'B'+figures[x];
-		chessboard[1][x] = 'B'+'P';
+		chessboard[0][x] = 'B' + figure_order[x];
+		chessboard[1][x] = 'B' + 'P';
 		for( y = 2 ; y < dim-2 ; y++){
 			chessboard[y][x] = '';
 		}
 		chessboard[dim-2][x] = 'W'+'P';
-		chessboard[dim-1][x] = 'W'+figures[x];
+		chessboard[dim-1][x] = 'W' + figure_order[x];
+		if(dim == 9 && x == 5) {
+		    chessboard[0][x] = 'BQ';
+		    chessboard[dim-1][x] = 'WQ'
+		}
 	}
 }
 
@@ -425,40 +600,42 @@ function render_chessboard() {
 	//chessboard.innerHTML = '';
 	let content = '';
 	let subcontent;
-	let field_value;
-	let color;
-	let image;
-	let result;
-  let x,y;
-	for( y = 0 ; y < dim ; y++ ){
-		if( y % 2 == 0 )
-			color = 'white';
-		else
-			color = 'black';
-		for( x = 0 ; x < dim ; x++ ){
-			if( board[y][x] != '' ){
-				//field_value = html_chess[board[i][j]];
-				image = 'image/'+board[y][x]+'_'+color+'_field.png';
-        //if( board[y][x][0] == 'B' )
-          image='image/'+board[y][x]+'.png';
-			  subcontent = '<div id="'+letters[x]+( dim - y )+'" class="chessfield-'+color+'" onclick="click_chessfield(this.id,\''+board[y][x]+'\')" ondrop="dropf(event)" ondragover="allowDrop(event)"><img src="'+image+'" ondragstart="dragStart(event)" ondragend="dragEnd(event)" ondrop="dropf(event)" draggable="true"></img></div>';
-			}
-			else{
-				field_value = '';
-        //image = 'image/'+color+'.png';
-			  subcontent = '<div id="'+letters[x]+( dim - y )+'" class="chessfield-'+color+'" onclick="click_chessfield(this.id,\''+board[y][x]+'\')" ondrop="dropf(event)" ondragover="allowDrop(event)">'+field_value+'</div>';
-      }
+    let field_side_size = chessboard_side / dim;
+    /*
+    height = 100 / dim;
+    width = 100 / dim;
+    */
+    chessboard.style.height = chessboard_side;
+    chessboard.style.width =  chessboard_side;
+    // chessboard.style.backgroundColor = "white";
+    // chessboard.style = "border: black solid 1px;";
+    for(let y=0;y<dim;y++) {
+        if( y % 2 == 0 ) 
+            color = white_field_color;
+        else
+            color = black_field_color;
+        for(let x=0;x<dim;x++) {
+            // field = y * dim + x + 1;
+            if( board[y][x] != '' ) {
+                piece_image = chess_piece_image_directory + board[y][x] + '.png';;
+                piece_image = '<img id="image_' + letters[x] + ( dim - y ) + '" src="' + piece_image + '" style="height: ' + field_side_size + '; width: ' + field_side_size + '; position: absolute;" draggable="false" onmousedown="start_moving_element(event)" onmouseup="stop_moving_element(event)"></img>';
+            }
+            else
+                piece_image = ''; 
+            subcontent = '<div id="' + letters[x] + ( dim - y ) + '" onclick="click_chessfield(this.id,\'' + board[y][x] + '\')" style="height: ' + field_side_size + '; width: ' + field_side_size + '; background-color: ' + color + '; display: inline-block;">' + piece_image + '</div>';
 			if( flip_view == 'W' )
-				content=content+subcontent;
+				content = content + subcontent;
 			else
-				content=subcontent+content;
-			if( color == 'white' )
-				color = 'black';
-			else
-				color = 'white';
-		}
-	}
-	chessboard.innerHTML = content;
+				content = subcontent + content;
+            if(color == white_field_color)
+                color = black_field_color;
+            else
+                color = white_field_color;
+            // chessboard[y][x] = ;
+        }
+        // content += '<br>';
+    }
+    chessboard.innerHTML = content;
   //render_moves_history();
 	result = check_game_result( board );
 	if( arrow_control_switch == 1 && result == 0 ){
@@ -478,9 +655,10 @@ function render_field_signs(){
 	let content_letters = '';
 	let subcontent_numbers;
 	let subcontent_letters;
+    let field_side_size = chessboard_side / dim;
 	for( let i = 0 ; i < dim ; i++ ){
-		subcontent_numbers = '<div class="field-numbers" style="height:'+square_side+';width:'+parseInt(0.5*square_side)+';"><span>'+( dim-i )+'</span></div>';
-		subcontent_letters = '<div class="field-letters"><span>'+letters[i]+'</span></div>';
+		subcontent_numbers = '<div class="field-numbers" style="height:' + field_side_size + ';width:' + parseInt(0.5 * field_side_size) + ';"><span>' + ( dim-i ) + '</span></div>';
+		subcontent_letters = '<div class="field-letters" style="height:' + parseInt(0.5 * field_side_size) + ';width:' + field_side_size + ';"><span>' + letters[i] + '</span></div>';
 		if( flip_view == 'W' ){
 			content_numbers = content_numbers + subcontent_numbers;
 			content_letters = content_letters + subcontent_letters;
@@ -494,67 +672,102 @@ function render_field_signs(){
 	board_letters.innerHTML = content_letters;
 }
 
-// functions to drag/push figures instead of clicking or using arrows+enter
-
-// drag bez imagu!!!
-function dragStart(event){
-  let field_id = event.target.parentNode.id;
-  let figure = get_field_value(board,field_id);
-  if( pawn_promotion_check > 0)
-    return 0;
-  setTimeout(function() {
-    //event.target.style.display = "none";
-//event.target.style.opacity=1;
-  }, 0);
-  if( field_id == clicked_field && click == 1 )
-    return 0;
-  click_chessfield(field_id,figure);
+// functions to move figures using mouse
+function start_moving_element(event) {
+    if(click == 1)
+        return 0;
+    console.log("Start moving");
+    let parent = event.target.parentNode;
+    let figure = get_field_value(board, parent.id);
+    if(figure[0] != player)
+        return 0;
+	let chess_board = document.getElementById("board");
+    mouse_moving_piece = event.target;
+    mouse_moving_piece.style.zIndex = '1000';
+    mouse_moving_piece_offset_x = event.offsetX;
+    mouse_moving_piece_offset_y = event.offsetY;
+    mouse_moving_start_field_offset_x = event.target.parentNode.getBoundingClientRect().left;
+    mouse_moving_start_field_offset_y = event.target.parentNode.getBoundingClientRect().top;
+    chess_board_x_left = chess_board.getBoundingClientRect().left;
+    chess_board_x_right = chess_board.getBoundingClientRect().right;
+    chess_board_y_bottom = chess_board.getBoundingClientRect().bottom;
+    chess_board_y_top = chess_board.getBoundingClientRect().top;
+    console.log(chess_board_x_left + ' ' + chess_board_x_right + ' ' + chess_board_y_bottom + ' ' + chess_board_y_top);
+    click_chessfield(parent.id, figure);
+    /*
+    console.log("Offset " + mouse_moving_piece_offset_x + " " + mouse_moving_piece_offset_y);
+    console.log("Field offset: " + mouse_moving_start_field_offset_x + " " + mouse_moving_start_field_offset_y);
+    console.log("x/y" + event.pageX + " " + event.pageY);
+    console.log("big offset" + event.target.parentNode.offsetX + " " + event.target.parentNode.offsetY);
+    */
 }
 
-function allowDrop(event) {
-  event.preventDefault();
+function move_element_over_field(event) {
+    if(! mouse_moving_piece)
+        return 1;
+    console.log("Drag");
+    let mouse_x = event.pageX;
+    let mouse_y = event.pageY;
+    if(mouse_x > chess_board_x_right || mouse_x < chess_board_x_left || mouse_y > chess_board_y_bottom || mouse_y < chess_board_y_top)
+        return 1;
+    // IF WE WANT TO HAVE THE MOUSE CURSOR IN THE MIDDLE OF THE CHESS PIECE IMAGE
+    mouse_moving_piece.style.top = mouse_y - (mouse_moving_piece.getBoundingClientRect().height / 2);
+    mouse_moving_piece.style.left = mouse_x - (mouse_moving_piece.getBoundingClientRect().width / 2);
+    // IF WE WANT TO HAVE THE MOUSE CURSOR AT THE POSITION WHERE IT WAS CLICKED
+    // mouse_moving_piece.style.top = mouse_y - mouse_moving_piece_offset_y;
+    // mouse_moving_piece.style.left = mouse_x - mouse_moving_piece_offset_x;
+    mouse_move = 1;
 }
 
-function dropf(event) {
-  let field_id = event.target.id;
-  let figure;
-  let result
-  if( ! field_id  ){
-    field_id = event.target.parentNode.id;
-    if( field_id == clicked_field ){
-      click = 0;
-      clicked_field_id.style.backgroundColor = get_field_color(clicked_field);
-      clear_possible_moves();
-      return 0;
+function stop_moving_element(event) {
+    if(! mouse_moving_piece)
+        return 1;
+    console.log("Stop moving");
+    mouse_moving_piece.style.zIndex = 'auto';
+    mouse_x = event.pageX;
+    mouse_y = event.pageY;
+    chess_field_click_test = 0;
+    for(let y=0;y<dim;y++) {
+        for(let x=0;x<dim;x++) {
+            element_id = get_field_name_from_board(x, y);
+            element = document.getElementById(element_id);
+            element_y = element.getBoundingClientRect().top;
+            element_x = element.getBoundingClientRect().left;
+            if(mouse_x >= element_x && mouse_x <= element_x + square_side && mouse_y >= element_y && mouse_y <= element_y + square_side) {
+                chess_field_click_test = 1;
+                click_chessfield(element.id, get_field_value(board, element.id));
+                break;
+            }
+        }
     }
-    if( pawn_promotion_check > 0 )
-      return 0;
-  }
-  figure = get_field_value(board,field_id);
-  result = click_chessfield(field_id,figure);
-  clear_possible_moves();
-  if( result == 0 && pawn_promotion_check == 0 ){
+    mouse_moving_piece = null;
+    mouse_moving_piece_offset_x = null;
+    mouse_moving_piece_offset_y = null;
     click = 0;
-    if( clicked_field_id )
-      clicked_field_id.style.backgroundColor = get_field_color(clicked_field);
-    return 0;
-  }
+    mouse_move = null;
+    if(chess_field_click_test == 0)
+        generate_board();
 }
 
-function dragEnd(event) {
-  //console.log("KONIEC przesuwania ");
-  //console.log(event.target);
-  event.target.style.display='block';
+
+function get_mouse_over_div(field, figure) {
+    over_mouse_field = field;
+    over_mouse_field_figure = figure;
 }
+
 // this function defines what happens after clicking on field, moving piece or pushing ENTER with arrows control enabled
-function click_chessfield(field_sign,figure) {
+function click_chessfield(field_sign, figure) {
   // funkcja do sprawdzenia - optymalizacja
 	let check_move;
 	let field = document.getElementById(field_sign);
 	//let field_value = field.innerHTML;
 	if( is_game_finished == 1 )
 		return 0;
-	if( pawn_promotion_check == 1 ){
+	if( pawn_promotion_check == 1 || pawn_promotion_check == 3){
+	    if(click == 0) {
+	        click = 1;
+	        return 1;
+	    }
 		blink_chess_promotion_field();
 		return 0;
 	}
@@ -566,7 +779,8 @@ function click_chessfield(field_sign,figure) {
 		clicked_field_value = figure;
 		field_color = get_field_color(field_sign);
 		if( figure != '' ){
-		  field.style.backgroundColor = field_sign_color;
+		    if(! mouse_moving_piece)
+		        field.style.backgroundColor = field_sign_color;
 			click = 1;
 		}
     if( showing_possible_moves == 1)
@@ -574,15 +788,24 @@ function click_chessfield(field_sign,figure) {
 	}
 	else {
     //clear_color_fields();
+
 		if( field_sign == clicked_field ){
 			//console.log(field_color);
-      if( arrow_control_switch == 1 && arrow_current_position == clicked_field )
-          field.style.backgroundColor = arrow_current_position_color;
-      else
-			 field.style.backgroundColor = get_field_color(field_sign);
-			click = 0;
-      clear_possible_moves();
-			return 0;
+            if( arrow_control_switch == 1 && arrow_current_position == clicked_field )
+                field.style.backgroundColor = arrow_current_position_color;
+            else {
+			    field.style.backgroundColor =  get_field_color(field.id); // get_field_color(field_sign);
+			    console.log(get_field_color(field.id));
+			}
+	        click = 0;
+            clear_possible_moves();
+        if(mouse_move) {
+            generate_board();
+            // mouse_moving_piece.style.top = mouse_moving_start_field_offset_y;
+            // mouse_moving_piece.style.left = mouse_moving_start_field_offset_x;
+            click = 1;
+        }
+	        return 0;
 		}
 		else if( figure[0] == player ){
       if( arrow_control_switch == 1 && arrow_current_position == clicked_field )
@@ -597,9 +820,11 @@ function click_chessfield(field_sign,figure) {
       clear_possible_moves();
       if( showing_possible_moves == 1)
         show_possible_moves( field_sign );
+		if(mouse_move)
+		    generate_board();
       return 0;
 		}
-		else if( pawn_promotion_check == 2 ){
+		else if( pawn_promotion_check >= 2 ){
       if( current_move_change == 1 ){
         //console.log("Zmiana historii przy promocji piona");
       }
@@ -610,16 +835,17 @@ function click_chessfield(field_sign,figure) {
 			current_move_from = clicked_field;
 			current_move_to = field_sign;
 			current_move_piece = clicked_field_value;
-      moves.push(current_move_from+':'+current_move_to+':'+pawn_promotion_piece[1]);
+            moves.push(current_move_from+':'+current_move_to+':'+pawn_promotion_piece[1]);
 			pawn_promotion_piece = '';
-			//player = opposite_player( player );
-			//render_chessboard();
 		}
 		else {
 			check_move = check_move_possibility(clicked_field_value,figure,clicked_field,field_sign);
 			//console.log('check_move_possibility('+clicked_field_value+','+figure+','+clicked_field+','+field_sign);
-			if( check_move == 0 )
+			if( check_move == 0 ) {
+			    if(mouse_move)
+			        generate_board();
 				return 0;
+			}
       if( game_with_computer == 0 && ( current_move_change == 1 ) ){
         if( current_move_global == moves.length-1 ){
         //if( current_move_global == moves.length-1 || moves[moves.length-1] == ( field_sign+':'+field_sign) ){
@@ -653,6 +879,13 @@ function click_chessfield(field_sign,figure) {
         }
 				pawn_promotion( player,field_sign,figure);
 				pawn_promotion_check = 1;
+				
+				if(mouse_move) {
+				    pawn_promotion_check = 3;
+				    // if you want to keep promoting pawn at the original place
+                    //mouse_moving_piece.style.top = mouse_moving_start_field_offset_y;
+                    //mouse_moving_piece.style.left = mouse_moving_start_field_offset_x;
+				}
 				return 0;
 				//clicked_field_value = player+pawn_promotion_piece;
 				//console.log( clicked_field_value );
@@ -663,22 +896,22 @@ function click_chessfield(field_sign,figure) {
 				if( check_move == 2 ){
 					check_if_second_rook_moved[player] = 1;
 					if( player == 'W' ){
-						update_board_field('F1',get_field_value(board,'H1'));
+						update_board_field(letters[dim - 3] + '1', get_field_value(board, 'H1'));
 						update_board_field('H1','');
 					}
 					if( player == 'B' ){
-						update_board_field('F8',get_field_value(board,'H8'));
+						update_board_field(letters[dim - 3] + dim, get_field_value(board,'H8'));
 						update_board_field('H8','');
 					}
 				}
 				if( check_move == 3 ){
 					check_if_first_rook_moved[player] = 1;
 					if( player == 'W' ){
-						update_board_field('D1',get_field_value(board,'A1'));
+						update_board_field(letters[3] + '1', get_field_value(board,'A1'));
 						update_board_field('A1','');
 					}
 					if( player == 'B' ){
-						update_board_field('F1',get_field_value(board,'A8'));
+						update_board_field(letters[3] + dim, get_field_value(board,'A8'));
 						update_board_field('A8','');
 					}
 				}
@@ -707,7 +940,8 @@ function click_chessfield(field_sign,figure) {
 			//render_chessboard();
 		}
 		player = opposite_player( player );
-    if( auto_flip_view == 1 && game_with_computer == 0 ){
+    // if( auto_flip_view == 1 && game_with_computer == 0 ){
+    if( auto_flip_view == 1){
       flip_view = player;
     }
 		generate_board();
@@ -785,7 +1019,7 @@ function check_move_possibility(old_field_value,new_field_value,clicked_field,fi
 	}
 	if( result == 0 )
 		return result;
-	if( check_if_king_will_be_checked_after_move( player,oldx,oldy,newx,newy,result ) == 1 ) {
+	if( check_if_king_will_be_checked_after_move( board, player,oldx,oldy,newx,newy,result ) == 1 ) {
 		//console.log("King will be in check!");
 		return 0;
 	}
@@ -945,7 +1179,7 @@ function check_move_king(chessboard, player, oldx,oldy,newx,newy) {
 	let fields = [];
 	if( ( newy == oldy && ( newx == oldx -1 || newx == oldx + 1 ) ) || ( newx == oldx && ( newy == oldy -1 || newy == oldy + 1 ) ) || ( ( newx == oldx+1 || newx == oldx-1 ) && ( newy == oldy+1 || newy == oldy-1 ) ) )
 		return 1;
-	if( castling == 1 && newy == oldy && check_if_king_moved[player] == 0 && ! check_if_king_is_checked(player,board) ){
+	if( castling == 1 && dim < 9 && newy == oldy && check_if_king_moved[player] == 0 && ! check_if_king_is_checked(player,board) ){
 		if( newx == oldx+2 && board[oldy][newx+1] == (player+'R') && check_if_second_rook_moved[player] == 0 ){
 			fields = show_fields_between_piece_and_destination(board,oldx,oldy,newx+1,newy);
 			for( let i=0;i<fields.length;i++ ){
@@ -1171,6 +1405,8 @@ function check_possible_moves_for_king( chessboard,kx,ky ){
 	let x,y;
 	let field;
   let castling_test;
+  console.log("Check move");
+  console_log_board(chessboard);
 	let player=chessboard[ky][kx][0];
 	if( chessboard[ky][kx][1] != 'K' )
 		return 0;
@@ -1180,12 +1416,12 @@ function check_possible_moves_for_king( chessboard,kx,ky ){
 				continue;
 			field = get_field_name_from_board( x,y );
 			if ( field != 0 ){
-				if( get_field_player( chessboard,field ) != player && check_if_king_will_be_checked_after_move( player,kx,ky,x,y,1 ) < 1 )
+				if( get_field_player( chessboard,field ) != player && check_if_king_will_be_checked_after_move( chessboard, player,kx,ky,x,y,1 ) < 1 )
 					moves.push(field);
 			}
 		}
 	}
-	if( castling == 1 && check_if_king_moved[player] == 0 && ! check_if_king_is_checked(player,chessboard) ){
+	if( castling == 1 && dim < 9 && check_if_king_moved[player] == 0 && ! check_if_king_is_checked(player,chessboard) ){
 		if( check_if_second_rook_moved[player] == 0 && chessboard[ky][dim-1] == (player+'R') ){
       castling_test = 1;
 			for( fields of show_fields_between_piece_and_destination(chessboard,kx,ky,dim-1,ky) ){
@@ -1196,13 +1432,13 @@ function check_possible_moves_for_king( chessboard,kx,ky ){
       }
       if( castling_test == 1 ){
         if( player == 'W' )
-          field = letters[dim-2]+'1';
+          field = letters[dim-2] + '1';
         else
-          field = letters[dim-2]+'8';
+          field = letters[dim-2] + dim;
         moves.push( field );
       }
 		}
-		if( check_if_first_rook_moved[player] == 0 && chessboard[ky][0] == (player+'R') ){
+		if( check_if_first_rook_moved[player] == 0 && chessboard[ky][0] == (player + 'R') ){
 		  castling_test = 1;
 			for( fields of show_fields_between_piece_and_destination(chessboard,kx,ky,1,ky) ){
 				if( get_field_value( chessboard,fields ) != '' || check_if_field_is_attacked( chessboard,fields,opposite_player(player)) > 0 ){
@@ -1212,9 +1448,9 @@ function check_possible_moves_for_king( chessboard,kx,ky ){
 			}
       if( castling_test == 1 ){
         if( player == 'W' )
-          field = letters[2]+'1';
+          field = letters[2] + '1';
         else
-          field = letters[2]+'8';
+          field = letters[2] + dim;
         moves.push( field );
       }
 		}
@@ -1580,7 +1816,7 @@ function check_if_player_can_capture_checking_piece( chessboard,player,fieldx,fi
 		for( let j=0;j<dim;j++ ){
 			if( chessboard[i][j][0] == player ) {
 				if( check_if_field_is_attacked_by_piece( chessboard,j,i,chessboard[i][j],get_field_name_from_board(fieldx,fieldy) ) > 0 ){
-					if( check_if_king_will_be_checked_after_move( player,j,i,fieldx,fieldy ) == 1 ){
+					if( check_if_king_will_be_checked_after_move( chessboard, player,j,i,fieldx,fieldy ) == 1 ){
 						continue;
 					}
 					return 1;
@@ -1611,7 +1847,7 @@ function check_if_it_is_possible_to_block_check(chessboard,by_player,oldx,oldy,n
 						field_between = get_board_index( fields_between[k] );
 						field_between_x = field_between['x'];
 						field_between_y = field_between['y'];
-						if( check_if_king_will_be_checked_after_move( by_player,fieldx,fieldy,field_between_x,field_between_y ) == 1 )
+						if( check_if_king_will_be_checked_after_move( chessboard, by_player,fieldx,fieldy,field_between_x,field_between_y ) == 1 )
 							continue;
 						return result;
 					}
@@ -1622,7 +1858,7 @@ function check_if_it_is_possible_to_block_check(chessboard,by_player,oldx,oldy,n
 	return 0;
 }
 
-function show_possible_moves_to_escape_check( chessboard,checked_player ) {
+function show_possible_moves_to_escape_check( chessboard, checked_player ) {
   let moves=[];
   let checking_pieces=[];
   let result;
@@ -1773,7 +2009,7 @@ function check_possible_moves_for_piece( chessboard,field ){
 		target = get_board_index( result[i] );
 		target_x = target['x'];
 		target_y = target['y'];
-		if( check_if_king_will_be_checked_after_move( player,x,y,target_x,target_y ) ){
+		if( check_if_king_will_be_checked_after_move( chessboard, player,x,y,target_x,target_y ) ){
 			result.splice(i,1);
 			i--;
 		}
@@ -1883,12 +2119,12 @@ function check_if_king_can_not_escape( chessboard,player ) {
 	return 1;
 }
 
-function check_if_king_will_be_checked_after_move( player,oldx,oldy,newx,newy,move_status=1 ) {
+function check_if_king_will_be_checked_after_move( chessboard, player,oldx,oldy,newx,newy,move_status=1 ) {
 	let previous_move,previous_move_x,previous_move_y;
 	let board_after_move = new Array(dim).fill(null).map(()=>new Array(dim).fill(null));
 	for( let i=0;i<dim;i++ ){
 		for( let j=0;j<dim;j++ ){
-			board_after_move[i][j] = board[i][j];
+			board_after_move[i][j] = chessboard[i][j];
 		}
 	}
 	board_after_move[oldy][oldx] = '';
@@ -2017,18 +2253,18 @@ function get_field_color(field){
   let field_name;
 	for( let i = 0 ; i < dim ; i++ ){
 		if( i % 2 == 0 )
-			color = 'white';
+			color = white_field_color;
 		else
-			color = 'black';
+			color = black_field_color;
 		for( let j = 0 ; j < dim ; j++ ){
       field_name = letters[j]+( dim - i );
       if( String(field) == String(field_name) ){
         return color;
       }
-      if( color == 'white' )
-        color = 'black';
+      if( color == white_field_color )
+        color = black_field_color;
       else
-        color = 'white';
+        color = white_field_color;
 		}
 	}
   return 0;
@@ -2164,7 +2400,7 @@ function show_possible_moves( field ){
 function clear_possible_moves( type='moves' ){
   let field;
   let color;
-  let color_to_clear = 'moves';
+  let color_to_clear;
   switch( type ){
     case 'moves':
       color_to_clear = possible_move_show_color;
@@ -2175,18 +2411,18 @@ function clear_possible_moves( type='moves' ){
   }
 	for( let i = 0 ; i < dim ; i++ ){
 		if( i % 2 == 0 )
-			color = 'white';
+			color = white_field_color;
 		else
-			color = 'black';
+			color = black_field_color;
 		for( let j = 0 ; j < dim ; j++ ){
-      field = document.getElementById(letters[j]+( dim - i ));
+            field = document.getElementById(letters[j]+( dim - i ));
 			if( field.style.backgroundColor == color_to_clear ){
-        field.style.backgroundColor = color;
-      }
-      if( color == 'white' )
-        color = 'black';
-      else
-        color = 'white';
+                field.style.backgroundColor = color;
+            }
+        if( color == white_field_color )
+            color = black_field_color;
+        else
+            color = white_field_color;
 		}
 	}
 }
@@ -2251,15 +2487,15 @@ function clear_color_fields(){
   let color;
 	for( let i = 0 ; i < dim ; i++ ){
 		if( i % 2 == 0 )
-			color = 'white';
+			color = white_field_color;
 		else
-			color = 'black';
+			color = black_field_color;
 		for( let j = 0 ; j < dim ; j++ ){
 			document.getElementById(letters[j]+( dim - i )).style.backgroundColor = color;
-      if( color == 'white' )
-        color = 'black';
+      if( color == white_field_color )
+        color = black_field_color;
       else
-        color = 'white';
+        color = white_field_color;
 		}
 	}
 	return 0;
@@ -2359,12 +2595,12 @@ function pawn_promotion( player,id,figure ){
   let id_color;
 	for( let i=0;i<promotion_pieces.length;i++){
 		//html_figure = html_chess[player+promotion_pieces[i]];
-    html_figure = '<img src="image/'+(player+promotion_pieces[i])+'_white_field.png" height="'+pawn_promotion_field_image_size+'px" width="'+pawn_promotion_field_image_size+'px"/>';
+    html_figure = '<img src="' + chess_piece_image_directory + (player + promotion_pieces[i]) + '.png" height="'+ pawn_promotion_field_image_size+'px" width="'+ pawn_promotion_field_image_size+'px"/>';
 		//content += html_figure+' ';
 		content += '<div class="promotion-piece" onclick="pawn_promote(\''+player+promotion_pieces[i]+'\',\''+id+'\',\''+figure+'\')">'+html_figure+'</div>';
 	}
   id_color = id_div.style.backgroundColor;
-  html_figure = '<img height="'+(0.8*pawn_promotion_field_image_size)+'px" width="'+(0.8*pawn_promotion_field_image_size)+'px" src="image/cancel.png"/>';
+  html_figure = '<img height="'+(0.8*pawn_promotion_field_image_size)+'px" width="'+(0.8*pawn_promotion_field_image_size)+'px" src="' + chess_piece_image_directory + 'cancel.png"/>';
 	content += '<div id="promotion-piece-cancel" onclick="revert_pawn_promotion(\''+id+'\',\''+id_color+'\')">'+html_figure+'</div>';
   id_div.style.backgroundColor = field_sign_color;
 	div.innerHTML = content;
@@ -2389,6 +2625,7 @@ function revert_pawn_promotion( promotion_field,color ){
   document.getElementById(promotion_field).style.backgroundColor = color;
   clicked_field_id.style.backgroundColor = field_color;
   div.innerHTML = '';
+  generate_board();
 }
 
 function blink_chess_promotion_field() {
@@ -2458,7 +2695,7 @@ function show_remaining_pieces(){
   let black_pieces = [];
   let black_uniq_pieces = [];
   let content = '';
-  let img_size = parseInt(square_side/2);
+  let img_size = parseInt(default_side / 2);
   //console.log(img_size+" px");
   white_pieces = get_remaining_pieces( board,'W' );
   black_pieces = get_remaining_pieces( board,'B' );
@@ -2467,24 +2704,24 @@ function show_remaining_pieces(){
   //console.log(white_uniq_pieces);
   //console.log(black_uniq_pieces);
   for( piece of white_pieces ){
-    //content += '<div style="border:solid 1px black;display:inline-block;"><img src="image/'+'W'+piece+'.png" height="'+img_size+'px" width="'+img_size+'px"></img></div>';
-    content += '<div style="display:inline-block;"><img src="image/min_'+'W'+piece+'.png" height="'+img_size+'px" ></img></div>';
+    //content += '<div style="border:solid 1px black;display:inline-block;"><img src="' + chess_piece_image_directory +'W'+piece+'.png" height="'+img_size+'px" width="'+img_size+'px"></img></div>';
+    content += '<div style="display:inline-block;"><img src="image_min/min_'+'W'+piece+'.png" draggable="false" height="'+img_size+'px" ></img></div>';
   }
   div_white.innerHTML = content;
   content = '';
   for( piece of black_pieces ){
-    //content += '<div style="border:solid 1px black;display:inline-block;"><img src="image/'+'B'+piece+'.png" height="'+img_size+'px" width="'+img_size+'px"></img></div>';
-    content += '<div style="display:inline-block;"><img src="image/min_'+'B'+piece+'.png" height="'+img_size+'px" ></img></div>';
+    //content += '<div style="border:solid 1px black;display:inline-block;"><img src="' + chess_piece_image_directory +'B'+piece+'.png" height="'+img_size+'px" width="'+img_size+'px"></img></div>';
+    content += '<div style="display:inline-block;"><img src="image_min/min_'+'B'+piece+'.png" draggable="false" height="'+img_size+'px" ></img></div>';
   }
   div_black.innerHTML = content;
   content = '';
   for( piece of white_uniq_pieces ){
-    content += '<img src="image/min_'+'W'+piece+'.png" height="'+img_size+'px"></img>';
+    content += '<img src="image_min/min_'+'W'+piece+'.png" draggable="false" height="'+img_size+'px"></img>';
   }
   div_white_uniq.innerHTML = content;
   content = '';
   for( piece of black_uniq_pieces ){
-    content += '<img src="image/min_'+'B'+piece+'.png" height="'+img_size+'px"></img>';
+    content += '<img src="image_min/min_'+'B'+piece+'.png" draggable="false" height="'+img_size+'px"></img>';
   }
   div_black_uniq.innerHTML = content;
 }
@@ -2789,7 +3026,7 @@ function back_to_move( move_number ){
 }
 
 // functions to reinitialize vars
-// do weryfikacji
+// to verify
 function reinitialize_vars() {
   moves = [];
   clicked_field='';
@@ -2821,7 +3058,7 @@ function reinitialize_vars() {
   document.getElementById("castling-check").disabled = false;
   document.getElementById("en_passant-check").disabled = false;
 }
-// do weryfikacji
+// to verify
 function reset_current_game_vars(){
   //player = 'W';
   clicked_field='';
@@ -2841,8 +3078,207 @@ function reset_current_game_vars(){
 	document.getElementById("pawn-promotion-field").innerHTML = '';
 }
 
+// computer playing functions
+function make_move(chess_board, from, to) {
+    let from_field = get_board_index(from);
+    let to_field = get_board_index(to);
+    chess_board[to_field['y']][to_field['x']] = chess_board[from_field['y']][from_field['x']];
+    chess_board[from_field['y']][from_field['x']] = '';
+}
+
+// EVALUATION MOVES
+/*
+EVALUATION:
+0. Mate net
+1. Material (though not relevant when the positino is much worse and/or the opponent has mate (unavoidable or requires to give material back) in X moves)
+2. Position (a lot of different aspects)
+3. How many fields are controlled by each player
+4. the position/safety of the king (both sides)
+5. Other things like zugzwangs, how pieces can be sued, where they are placed, if they are blocked and so on, if pawns are doubled, how far they are
+6. Who controls the center
+*/
+
+function evaluate_moves(chess_board, player, depth=1) {
+    let moves = {};
+    let opponent_moves = [];
+    let player_moves = get_all_possible_moves_for_player(chess_board, player);
+    for(let i=0;i<player_moves.length;i++) {
+        move = player_moves[i];
+        move_from = move.substring(0,2);
+        move_to = move.substring(3,5);
+        move_index = get_board_index(move_from);
+        move_from_x = move_index['x'];
+        move_from_y = move_index['y'];
+        move_index = get_board_index(move_to);
+        move_to_x = move_index['x'];
+        move_to_y = move_index['y'];
+        moving_piece = chess_board[move_from_y][move_from_x];
+        move_to_value = chess_board[move_to_y][move_to_x];
+        testing_board = new Array(dim).fill(null).map(()=>new Array(dim).fill(null));
+        copy_chess_board(testing_board, board);
+        make_move(testing_board, move_from, move_to);
+        if( check_if_king_is_mated(opponent, testing_board) == 1 )
+            moves[move] = 10;
+        // else if( check_if_can_mate(opponent, chess_board) )
+        else {
+            opponent_moves = check_if_player_can_capture_piece(chess_board, opponent);
+            player_moves = check_if_player_can_capture_piece(chess_board, player);
+            console.log("Opponent capture moves: " + opponent_moves);
+            console.log("Player capture moves: " + player_moves);
+        }
+    }
+}
+
+function check_if_can_mate(player, chess_board, depth=1) {
+    let opponent = opposite_player(player);
+    let moves = [];
+    let new_board = new Array(dim).fill(null).map(()=>new Array(dim).fill(null));
+    let testing_board;
+    copy_chess_board(new_board, chess_board);
+    let player_moves = get_all_possible_moves_for_player(new_board, player);
+    for(let i=0;i<player_moves.length;i++) {
+        move = player_moves[i];
+        // console.log("Move: " + move);
+        testing_board = new Array(dim).fill(null).map(()=>new Array(dim).fill(null));
+        copy_chess_board(testing_board, chess_board);
+        make_move(testing_board, move.substring(0,2), move.substring(3,5));
+        // console.log(testing_board);
+        if( check_if_king_is_mated(opponent, testing_board) == 1 ) {
+            moves.push(move);
+        }
+    }
+    return moves;
+}
+
+function get_figure_strength(figure) {
+    for(let piece in figure_strength) {
+        if(piece == figure)
+           return figure_strength[figure];
+    }
+    return null;
+}
+
+function count_material(chessboard) {
+    let white_player_count = 0;
+    let black_player_count = 0;
+    for(let y=0;y<dim;y++) {
+        for(let x=0;x<dim;x++) {
+            let field_value = chessboard[y][x];
+            let player = field_value[0];
+            let piece = field_value[1];
+            if(piece == 'K')
+                continue;
+            if(player == 'W')
+                white_player_count += figure_strength[piece];
+            else if(player == 'B')
+                black_player_count += figure_strength[piece];
+        }
+    }
+    return {'W': white_player_count, 'B': black_player_count};
+}
+
+function check_which_fields_are_under_control(chess_board) {
+    let fields_controlled_by_white = [];
+    let empty_fields_controlled_by_white = [];
+    let fields_targeted_by_white = [];
+    let fields_controlled_by_black = [];
+    let empty_fields_controlled_by_black = [];
+    let fields_targeted_by_black = [];
+
+    for(let y=0;y<dim;y++) {
+        for(let x=0;x<dim;x++) {
+            let field = get_field_name_from_board(x, y);
+            let field_value = chess_board[y][x];
+            let player = field_value[0];
+            let piece = field_value[1];
+            let moves = check_possible_moves_for_piece(chess_board, field);
+            
+            if(player == 'W')
+                white_player_count += figure_strength[piece];
+            else if(player == 'B')
+                black_player_count += figure_strength[piece];
+        }
+    }
+    return {'W': white_player_count, 'B': black_player_count};
+}
+
+function check_if_player_can_capture_any_piece(chess_board, player, depth) {
+    let cmoves = [];
+    let new_board = new Array(dim).fill(null).map(()=>new Array(dim).fill(null));
+    copy_chess_board(new_board, chess_board);
+    let opponent = opposite_player(player);
+    let player_moves = get_all_possible_moves_for_player(chess_board, player);
+    for(let i=0;i<player_moves.length;i++) {
+        move = player_moves[i];
+
+        move_from = move.substring(0,2);
+        move_to = move.substring(3,5);
+        move_index = get_board_index(move_from);
+        move_from_x = move_index['x'];
+        move_from_y = move_index['y'];
+        move_index = get_board_index(move_to);
+        move_to_x = move_index['x'];
+        move_to_y = move_index['y'];
+        moving_piece = chess_board[move_from_y][move_from_x];
+        move_to_value = chess_board[move_to_y][move_to_x];
+        if(move_to_value != '') {
+            cmoves.push(move);
+            // console.log(board);
+            console.log("Move " + move);
+            console.log("From " + move_from + "   to " + move_to);
+            console.log("x: " + move_from_x, '  y: ' + move_from_y);
+            console.log("Moving from " + moving_piece);
+            console.log("Moving to " + move_to_value);
+            // move_to_player = move_to_value[0];
+            move_from_piece = moving_piece[1];
+            console.log("Moving piece: " + move_from_piece);
+            move_from_piece_strength = figure_strength[move_from_piece];
+            console.log("strength: " + move_from_piece_strength);
+            move_to_piece = move_to_value[1];
+            move_to_piece_strength = figure_strength[move_to_piece];
+            console.log(move + " , piece: " + move_to_piece + " , strength: " + move_from_piece_strength + " vs " + move_to_piece_strength);
+            let testing_board = new Array(dim).fill(null).map(()=>new Array(dim).fill(null));
+            copy_chess_board(testing_board, new_board);
+            make_move(testing_board, move.substring(0,2), move.substring(3,5));
+            opponent_check_mate_moves = check_if_can_mate(opponent, testing_board);
+            // console_log_board(testing_board);
+            if(depth == 0)
+                continue;
+            if( opponent_check_mate_moves.length > 0 ) {
+                console.log("But it can result in MATE");
+                console.log("Mate - " + opponent_check_mate_moves);
+            }
+            else {
+                check_further_moves = check_if_player_can_capture_on_field(testing_board, move_to, opponent);
+                console.log("Recapture moves: " + check_further_moves);
+                for(let j=0;j<check_further_moves.length;j++) {
+                    console.log("Can be recaptured - " + check_further_moves[j]);
+                }
+            }
+            
+            // else if( check_if_player_can_capture_piece) 
+        }
+    }
+    return cmoves;
+}
+
+function check_if_player_can_capture_on_field(chess_board, field, player) {
+    let moves = [];
+    let player_moves = get_all_possible_moves_for_player(chess_board, player);
+    console.log("Player moves: " + player_moves);
+    for(let i=0;i<player_moves.length;i++) {
+        move = player_moves[i];
+        // move_from = move.substring(0,2);
+        move_to = move.substring(3,5);
+        if(move_to == field) {
+            moves.push(move);
+        }
+    }
+    return moves;
+}
+
 // function to control CSS in window resize
-// porpawa tego 100 na pałę!
+// be careful during changing this!
 function set_board_dimensions(){
 	let height = window.innerHeight;
 	let width = window.innerWidth;
@@ -2869,52 +3305,65 @@ function set_board_dimensions(){
   let figures_material = document.getElementById("figures-material");
 	let figures_material_img = document.getElementById("figures-material-img");
   let moves_history_panel = document.getElementById("moves_history_panel");
-	let chessboard_side;
 	let side;
-  chessboard_side = parseInt(0.8*height);
+  chessboard_side = parseInt(0.85 * height);
+  side=parseInt(chessboard_side/dim);
+  square_side = side;
+  letters.style.height = parseInt(0.5 * side);
+  letters.style.fontSize = parseInt(side / 2);
+  letters.style.marginLeft = parseInt(0.5 * side);
+  empty_top_field.style.height = parseInt(0.15 * height - 0.7 * side); // 0.75 * side);
+  pawn_promotion_field_image_size = parseInt(0.15 * height - 0.7 * side); // parseInt(0.9 * empty_top_field.style.height);
+  pawn_promotion_field.style.fontSize = parseInt(0.5*side);
+  pawn_promotion_field.style.marginLeft = parseInt(0.5*side);
+  
   // novelty
+  /*
   while( ( chessboard_side % dim ) != 0 ){
-    chessboard_side++;
+    chessboard_side ++;
   }
   // novelty END
   if( width < (2 * chessboard_side) ){
     chessboard_side = parseInt(0.45*width);
-    if( chessboard_side > (0.8*height) )
-      chessboard_side = parseInt(0.8*height);
+    if( chessboard_side > (0.9*height) )
+      chessboard_side = parseInt(0.9*height);
   }
-	side=parseInt(chessboard_side/dim);
-  square_side = side;
+  */
+
+  default_side = parseInt(chessboard_side / default_dim);
 	chessboard.style.height = chessboard_side;
 	chessboard.style.width = chessboard_side;
 	numbers.style.height = chessboard_side;
-  numbers.style.width = parseInt(0.5*side);
-  numbers.style.fontSize = parseInt(side/2);
-  notifications_current_game.style.width = chessboard_side + parseInt(0.5*side)+4;
-	letters.style.width = chessboard_side;
-  letters.style.height = parseInt(0.5*side);
-  letters.style.fontSize = parseInt(side/2);
-  empty_top_field.style.height = side;
+  numbers.style.width = parseInt(0.5 * side);
+  numbers.style.fontSize = parseInt(side / 2);
+  notifications_current_game.style.width = chessboard_side + parseInt(0.5 * side) + 4;
+  // letters.style.width = chessboard_side;
+  // empty_top_field.style.height = parseInt(0.1 * height - 0.5 * side);
+  
+  // Right side (mostly)
+  side = default_side;
   options_main.style.height = side;
+  /*
   pawn_promotion_field.style.height = parseInt(0.85*side);
   pawn_promotion_field.style.marginLeft = parseInt(0.5*side);
   pawn_promotion_field.style.fontSize = parseInt(0.5*side);
-  pawn_promotion_field_image_size = parseInt(0.8*side);
-  letters.style.marginLeft = (parseInt(0.5*side)+2);
+  pawn_promotion_field_image_size = parseInt(0.8 * side);
+  */
   left_panel.style.width = parseInt(chessboard_side + numbers.offsetWidth + 10);
   user_panel.style.height = chessboard_side;
-  game_options.style.height = parseInt(3*side);
-  game_options.style.minHeight = parseInt(3*side);
-  game_options.style.maxHeight = parseInt(3*side);
-  moves_history.style.height = parseInt(parseInt(2.5*side));
-  moves_history.style.maxHeight = parseInt(parseInt(2.5*side));
-  game_options_buttons.style.height = parseInt(2.25*side);
-  game_options_buttons.style.maxHeight = parseInt(2.25*side);
-  game_options_checks.style.height = parseInt(2.25*side)
-  game_options_checks.style.maxHeight = parseInt(2.25*side)
-  computer_game_options.style.height = parseInt( 0.5*side);
-  figures_remaining.style.height = 1.25*side;
+  game_options.style.height = parseInt(3.75 * side);
+  game_options.style.minHeight = parseInt(3.75 * side);
+  game_options.style.maxHeight = parseInt(3.75 * side);
+  moves_history.style.height = parseInt(parseInt(1.5 * side));
+  moves_history.style.maxHeight = parseInt(parseInt(1.5 * side));
+  game_options_buttons.style.height = parseInt(2.4 * side);
+  game_options_buttons.style.maxHeight = parseInt(2.4 * side);
+  game_options_checks.style.height = parseInt(2.25 * side)
+  game_options_checks.style.maxHeight = parseInt(2.25 * side)
+  computer_game_options.style.height = parseInt( 0.5 * side);
+  figures_remaining.style.height = 1.25 * side;
   figures_remaining_img.style.height = side;
-  figures_material.style.height = 1.25*side;
+  figures_material.style.height = 1.25 * side;
   figures_material_img.style.height = side;
 
   if( (width - (chessboard_side + numbers.offsetWidth + 100) ) > chessboard_side ){
@@ -2925,9 +3374,9 @@ function set_board_dimensions(){
     right_panel.style.maxWidth = width - ( left_panel.offsetWidth +100 );
     moves_history.style.width = width - ( left_panel.offsetWidth +100 );
   }
-  game_options.style.maxHeight = parseInt(2.5*side);
+  game_options.style.maxHeight = parseInt(2.5 * side);
   moves_history.style.width = game_options.offsetWidth;
-  if( pawn_promotion_check == 1 ){
+  if( pawn_promotion_check == 1 || pawn_promotion_check == 3){
       for( let image of document.querySelectorAll("#pawn-promotion-field img") ){
         //console.log( i );
         if( image.id == 'promotion-piece-cancel' )
@@ -2935,8 +3384,8 @@ function set_board_dimensions(){
         image.style.height = pawn_promotion_field_image_size+'px';
         image.style.width = pawn_promotion_field_image_size+'px';
       }
-     document.querySelector("#promotion-piece-cancel img").style.height = (0.8*pawn_promotion_field_image_size)+'px';
-     document.querySelector("#promotion-piece-cancel img").style.width = (0.8*pawn_promotion_field_image_size)+'px';
+     document.querySelector("#promotion-piece-cancel img").style.height = (0.8 * pawn_promotion_field_image_size)+'px';
+     document.querySelector("#promotion-piece-cancel img").style.width = (0.8 * pawn_promotion_field_image_size)+'px';
     // pawn_promotion_field_image_size
   }
 
@@ -2950,7 +3399,10 @@ function console_log_board( chessboard ) {
 	let row='';
 	for( let i = 0 ; i < dim ; i++ ){
 		for( let j = 0 ; j < dim ; j++ ){
-			row+=chessboard[i][j]+',';
+		    if(chessboard[i][j] == '')
+		        row += "'' ";
+		    else
+			    row += chessboard[i][j] + ' ';
 		}
 		console.log(row);
 		row='';
@@ -2966,6 +3418,26 @@ function change_board_situation( chessboard ){
 	}
 	generate_board();
 }
+
+function prepare_position(map) {
+
+}
+
+function prepare_position_from_starting_position(map) {
+    let new_board = new Array(dim).fill(null).map(()=>new Array(dim).fill(null));
+    copy_chess_board(new_board, board);
+    
+
+}
+
+function copy_chess_board(new_board, chess_board) {
+    for(let y=0;y<dim;y++) {
+        for(let x=0;x<dim;x++) {
+            new_board[y][x] = chess_board[y][x];
+        }
+    }
+}
+
 
 // FUNCTIONS for the FUTURE
 

@@ -18,8 +18,7 @@
 				<div id="chessboard">
 					<div id="board-top">
 						<div id="numbers"></div>
-						<div id="board">
-						</div>
+						<div id="board" onmousemove="move_element_over_field(event)"></div>
 					</div>
 					<div id="letters-container">
 						<div id="letters"></div>
@@ -75,6 +74,25 @@
 								<input type="checkbox" id="control_with_arrows-check" onclick="switch_control_by_arrows( this )" unchecked>
 								<label for="control_with_arrows-check">use arrows to move</label>
 							</div>
+						</div>
+						<div id="play_options">
+								<input type="checkbox" id="64-field-check" class="play_options_check" onclick="set_64_field_board_check(this)" checked>
+								<label for="64-field-check">64 fields (normal)</label>
+								<input type="checkbox" id="81-field-check" class="play_options_check" onclick="set_81_field_board_check(this)" unchecked>
+								<label for="81-field-check">81 fields</label>
+								<input type="checkbox" id="100-field-check" class="play_options_check" onclick="set_100_field_board_check(this)" unchecked>
+								<label for="100-field-check">100 fields</label>
+								<input type="checkbox" id="121-field-check" class="play_options_check" onclick="set_121_field_board_check(this)" unchecked>
+								<label for="121-field-check">121 fields</label>
+								<br>
+								<input type="checkbox" id="color-white-black-check" class="color_set_class" onclick="set_black_white_color(this)" unchecked>
+								<label for="color-white-black-check">white/black (classic)</label>
+								<input type="checkbox" id="color-white-blue-check" class="color_set_class" onclick="set_white_blue_color(this)" unchecked>
+								<label for="color-white-blue-check">color set 2</label>
+								<input type="checkbox" id="color-default-set-check" class="color_set_class" onclick="set_default_color(this)" checked>
+								<label for="color-default-set-check">color set 3</label>
+								<input type="checkbox" id="color-double-blue-set-check" class="color_set_class" onclick="set_double_blue_color(this)" unchecked>
+								<label for="color-double-blue-set-check">color set 4</label>
 						</div>
 						<div id="computer-game-options">
 							<b>Computer play settings</b>

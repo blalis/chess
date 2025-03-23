@@ -1,0 +1,171 @@
+<html>
+    <head>
+        <style>
+#chaessboard {
+    margin-top: 60px;
+    margin-left: 100px;
+    height: 500px;
+    width: 500px;
+    border: solid black 2px;
+    background-color: lightblue;
+}
+#to_move {
+    height: 60px;
+    width: 90px;
+    background-color: black;
+    position: absolute;
+}
+.chess_field {
+    /*
+    border-top: black solid 1px;
+    border-left: black solid 1px;
+    */
+}
+        </style>
+    </head>
+    <body>
+        <div id="chessboard" onmousemove="move_element_over_field(event)" onclick="stop_moving_element(event)">
+            <!-- <div id="to_move" onmousedown="start_moving_element(event)" onmouseup="stop_moving_element(event)"></div> -->
+        </div>
+        <script>
+let in_the_field = 1;
+let mouse_move = 0;
+let moving_piece = null;
+let moving_piece_offset_x = null;
+let moving_piece_offset_y = null;
+
+let chessboard_html = document.getElementById("chessboard");
+let field_side_size = 98;
+let chess_side = 8;
+let chessboard_size = chess_side * field_side_size;
+let white_color = 'lightyellow';
+let black_color = 'lightblue';
+
+create_chessboard();
+
+
+function create_chessboard() {
+    let content = '';
+    chessboard.style.height =  chessboard_size;
+    chessboard.style.width =  chessboard_size;
+    chessboard.style.backgroundColor = "white";
+    chessboard.style.border= "black solid 1px";
+    //chessboard.style.borderRight = "black solid 1px";
+    //chessboard.style.borderBottom = "black solid 1px";
+    let color = white_color;
+    for(let y=0;y<chess_side;y++) {
+        for(let x=0;x<chess_side;x++) {
+            field = y * chess_side + x + 1;
+            piece = get_piece(y, x);
+            if(piece) {
+                piece_image = get_piece_image(piece);
+                piece_image = '<img id="image_' + field + '" src="' + piece_image + '" style="height: ' + field_side_size + '; width: ' + field_side_size + '; position: absolute;" draggable="false" onmousedown="start_moving_element(event)" onmouseup="stop_moving_element(event)"></img>';
+            }
+            else
+                piece_image = ''; 
+            chessboard_html.innerHTML += '<div id="field_' + field + '" class="chess_field" style="height: ' + field_side_size + '; width: ' + field_side_size + '; background-color: ' + color + '; display: inline-block;">' + piece_image + '</div>';
+            // chessboard[y][x] = ;
+            if(color == white_color)
+                color = black_color;
+            else
+                color = white_color;
+        }
+        if(color == white_color)
+            color = black_color;
+        else
+            color = white_color;
+        chessboard_html.innerHTML += '<br>';
+    }
+    // chessboard_html.innerHTML = content;
+}
+
+function get_piece(y, x) {
+    if(y == 0) {
+        return 'B' + get_piece_poistion_by_x(x);
+    }
+    else if(y == 1)
+        return 'BP';
+    else if(y == chess_side - 2)
+        return 'WP';
+    else if(y == chess_side - 1) {
+        return 'W' + get_piece_poistion_by_x(x);
+    }
+    return null;
+}
+
+function get_piece_poistion_by_x(x) {
+    switch(x) {
+        case 0:
+        case chess_side - 1:
+            return 'R';;
+        case 1:
+        case chess_side - 2:
+            return 'N';;
+        case 2:
+        case chess_side - 3:
+            return 'B';;
+        case 3:
+            return 'Q';;
+        case 4:
+            return 'K';;
+    }
+    return null;
+}
+
+function get_piece_image(piece) {
+    return 'image/' + piece + '.png';
+}
+
+function start_moving_element(event) {
+    let el = event.target;
+    mouse_move = 1;
+    moving_piece = event.target;
+    moving_piece_offset_x = event.offsetX;
+    moving_piece_offset_y = event.offsetY;
+}
+
+function stop_moving_element(event) {
+    let el = event.target;
+    mouse_move = 0;
+    moving_piece.style.zIndex = 'auto';
+    moving_piece = null;
+    console.log("Client " + event.clientX + " " + event.clientY);
+    console.log("Page " + event.pageX + " " + event.pageY);
+}
+
+
+function move_element_over_field(event) {
+    // event.stopPropagation();
+    if(! moving_piece)
+        return 1;
+    moving_piece.style.zIndex = '1000';
+    // moving_piece.style.top = event.pageY - (moving_piece.getBoundingClientRect().height / 2);
+    // moving_piece.style.left = event.pageX - (moving_piece.getBoundingClientRect().width / 2);
+    moving_piece.style.top = event.pageY - moving_piece_offset_y;
+    moving_piece.style.left = event.pageX - moving_piece_offset_x;
+    /*    
+    mx = event.pageX - moving_piece_offset_x;
+    my = event.pageY - moving_piece_offset_y;
+    moving_piece.style.translate = mx + 'px ' + my + 'px';
+    console.log(moving_piece.style.tarnsform);
+    */
+
+}
+
+/*
+function enter_the_field(event) {
+    event.stopPropagation();
+    in_the_field=0;
+}
+*/
+
+function leave_the_field(event) {
+    event.stopPropagation();
+    mouse_move = 0;
+    moving_piece = null;
+    // in_the_field=0;
+}
+
+        </script>
+    </body>
+</html>

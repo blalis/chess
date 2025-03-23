@@ -1,6 +1,7 @@
 A chess program written in pure JavaScript ( JS, HTML, CSS ).
 Currently only level 0 is programmed - totally random moves made by computer
 (software random generator). There are still few minor bugs to eliminate.
+It doesn't work well (the chessboard rendering) on Firefox now.
 <br>
 Future changes and plans:
 1) adding higher difficulty levels
