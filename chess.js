@@ -600,7 +600,7 @@ function render_chessboard() {
 	//chessboard.innerHTML = '';
 	let content = '';
 	let subcontent;
-    let field_side_size = chessboard_side / dim;
+    let field_side_size = parseInt(chessboard_side / dim);
     /*
     height = 100 / dim;
     width = 100 / dim;
@@ -610,7 +610,7 @@ function render_chessboard() {
     // chessboard.style.backgroundColor = "white";
     // chessboard.style = "border: black solid 1px;";
     for(let y=0;y<dim;y++) {
-        if( y % 2 == 0 ) 
+        if( y % 2 == 0 )
             color = white_field_color;
         else
             color = black_field_color;
@@ -621,7 +621,7 @@ function render_chessboard() {
                 piece_image = '<img id="image_' + letters[x] + ( dim - y ) + '" src="' + piece_image + '" style="height: ' + field_side_size + '; width: ' + field_side_size + '; position: absolute;" draggable="false" onmousedown="start_moving_element(event)" onmouseup="stop_moving_element(event)"></img>';
             }
             else
-                piece_image = ''; 
+                piece_image = '';
             subcontent = '<div id="' + letters[x] + ( dim - y ) + '" onclick="click_chessfield(this.id,\'' + board[y][x] + '\')" style="height: ' + field_side_size + '; width: ' + field_side_size + '; background-color: ' + color + '; display: inline-block;">' + piece_image + '</div>';
 			if( flip_view == 'W' )
 				content = content + subcontent;
@@ -655,7 +655,7 @@ function render_field_signs(){
 	let content_letters = '';
 	let subcontent_numbers;
 	let subcontent_letters;
-    let field_side_size = chessboard_side / dim;
+    let field_side_size = parseInt(chessboard_side / dim);
 	for( let i = 0 ; i < dim ; i++ ){
 		subcontent_numbers = '<div class="field-numbers" style="height:' + field_side_size + ';width:' + parseInt(0.5 * field_side_size) + ';"><span>' + ( dim-i ) + '</span></div>';
 		subcontent_letters = '<div class="field-letters" style="height:' + parseInt(0.5 * field_side_size) + ';width:' + field_side_size + ';"><span>' + letters[i] + '</span></div>';
@@ -879,7 +879,7 @@ function click_chessfield(field_sign, figure) {
         }
 				pawn_promotion( player,field_sign,figure);
 				pawn_promotion_check = 1;
-				
+
 				if(mouse_move) {
 				    pawn_promotion_check = 3;
 				    // if you want to keep promoting pawn at the original place
@@ -3192,7 +3192,7 @@ function check_which_fields_are_under_control(chess_board) {
             let player = field_value[0];
             let piece = field_value[1];
             let moves = check_possible_moves_for_piece(chess_board, field);
-            
+
             if(player == 'W')
                 white_player_count += figure_strength[piece];
             else if(player == 'B')
@@ -3255,8 +3255,8 @@ function check_if_player_can_capture_any_piece(chess_board, player, depth) {
                     console.log("Can be recaptured - " + check_further_moves[j]);
                 }
             }
-            
-            // else if( check_if_player_can_capture_piece) 
+
+            // else if( check_if_player_can_capture_piece)
         }
     }
     return cmoves;
@@ -3316,7 +3316,7 @@ function set_board_dimensions(){
   pawn_promotion_field_image_size = parseInt(0.15 * height - 0.7 * side); // parseInt(0.9 * empty_top_field.style.height);
   pawn_promotion_field.style.fontSize = parseInt(0.5*side);
   pawn_promotion_field.style.marginLeft = parseInt(0.5*side);
-  
+
   // novelty
   /*
   while( ( chessboard_side % dim ) != 0 ){
@@ -3339,7 +3339,7 @@ function set_board_dimensions(){
   notifications_current_game.style.width = chessboard_side + parseInt(0.5 * side) + 4;
   // letters.style.width = chessboard_side;
   // empty_top_field.style.height = parseInt(0.1 * height - 0.5 * side);
-  
+
   // Right side (mostly)
   side = default_side;
   options_main.style.height = side;
@@ -3426,7 +3426,7 @@ function prepare_position(map) {
 function prepare_position_from_starting_position(map) {
     let new_board = new Array(dim).fill(null).map(()=>new Array(dim).fill(null));
     copy_chess_board(new_board, board);
-    
+
 
 }
 
